@@ -18,6 +18,11 @@
 package org.kurento.tutorial.groupcall;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.kurento.client.IceCandidate;
 import org.slf4j.Logger;
@@ -31,6 +36,8 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+
+import javax.print.attribute.HashAttributeSet;
 
 /**
  * 
@@ -49,12 +56,14 @@ public class CallHandler extends TextWebSocketHandler {
   @Autowired
   private UserRegistry registry;
 
+  private HashSet<String> listDisable = new HashSet<String>();
+
   @Override
   public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
     final JsonObject jsonMessage = gson.fromJson(message.getPayload(), JsonObject.class);
 
     final UserSession user = registry.getBySession(session);
-
+    ConcurrentHashMap<String, UserSession> users = registry.getAll();
     if (user != null) {
       log.debug("Incoming message from user '{}': {}", user.getName(), jsonMessage);
     } else {
@@ -70,9 +79,39 @@ public class CallHandler extends TextWebSocketHandler {
         final UserSession sender = registry.getByName(senderName);
         final String sdpOffer = jsonMessage.get("sdpOffer").getAsString();
         user.receiveVideoFrom(sender, sdpOffer);
+        if(listDisable.contains(senderName)){
+          user.disableAudio(sender);
+        }
+//        for(String key : listDisable){
+//          System.out.println("Day la key "+key);
+//          UserSession sender3 = registry.getByName(key);
+//          users.get(name).disableAudio(sender);
+//        }
         break;
       case "leaveRoom":
-        leaveRoom(user);
+        String leaver = jsonMessage.get("leaver").getAsString();
+        JsonObject leaveMsg = new JsonObject();
+        leaveMsg.addProperty("id", "leave");
+        leaveMsg.addProperty("user", leaver);
+        users.get(leaveMsg);
+        leaveRoom(users.get(leaver));
+        break;
+      case "disableSound":
+        String senderName1 = jsonMessage.get("disabler").getAsString();
+        listDisable.add(senderName1);
+        for (String key: users.keySet()) {
+          UserSession sender1 = registry.getByName(senderName1);
+          users.get(key).disableAudio(sender1);
+        }
+
+        break;
+      case "disableVideo":
+        String senderName2 = jsonMessage.get("disabler").getAsString();
+        listDisable.remove(senderName2);
+        for (String key: users.keySet()) {
+          UserSession sender2 = registry.getByName(senderName2);
+          users.get(key).disableVideo(sender2);
+        }
         break;
       case "onIceCandidate":
         JsonObject candidate = jsonMessage.get("candidate").getAsJsonObject();
@@ -99,9 +138,16 @@ public class CallHandler extends TextWebSocketHandler {
     final String name = params.get("name").getAsString();
     log.info("PARTICIPANT {}: trying to join room {}", name, roomName);
 
-    Room room = roomManager.getRoom(roomName);
+    Room room = roomManager.getRoomAndHost(roomName, name);
     final UserSession user = room.join(name, session);
     registry.register(user);
+//    ConcurrentHashMap<String, UserSession> users = registry.getAll();
+//
+//    for(String key : listDisable){
+//      System.out.println("Day la key "+key);
+//      UserSession sender = registry.getByName(key);
+//      users.get(name).disableAudio(sender);
+//    }
   }
 
   private void leaveRoom(UserSession user) throws IOException {
@@ -110,5 +156,8 @@ public class CallHandler extends TextWebSocketHandler {
     if (room.getParticipants().isEmpty()) {
       roomManager.removeRoom(room);
     }
+    listDisable.remove(user.getRoomName());
   }
+
+
 }

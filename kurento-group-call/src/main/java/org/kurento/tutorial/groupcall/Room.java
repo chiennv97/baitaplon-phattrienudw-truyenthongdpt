@@ -48,14 +48,16 @@ public class Room implements Closeable {
   private final ConcurrentMap<String, UserSession> participants = new ConcurrentHashMap<>();
   private final MediaPipeline pipeline;
   private final String name;
+  private final String hostRoom;
 
   public String getName() {
     return name;
   }
 
-  public Room(String roomName, MediaPipeline pipeline) {
+  public Room(String roomName, MediaPipeline pipeline, String hostRoom) {
     this.name = roomName;
     this.pipeline = pipeline;
+    this.hostRoom = hostRoom;
     log.info("ROOM {} has been created", roomName);
   }
 

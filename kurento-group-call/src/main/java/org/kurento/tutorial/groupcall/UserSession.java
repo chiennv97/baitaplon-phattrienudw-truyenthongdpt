@@ -22,12 +22,7 @@ import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import org.kurento.client.Continuation;
-import org.kurento.client.EventListener;
-import org.kurento.client.IceCandidate;
-import org.kurento.client.IceCandidateFoundEvent;
-import org.kurento.client.MediaPipeline;
-import org.kurento.client.WebRtcEndpoint;
+import org.kurento.client.*;
 import org.kurento.jsonrpc.JsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -104,6 +99,7 @@ public class UserSession implements Closeable {
   }
 
   public void receiveVideoFrom(UserSession sender, String sdpOffer) throws IOException {
+
     log.info("USER {}: connecting with {} in room {}", this.name, sender.getName(), this.roomName);
 
     log.trace("USER {}: SdpOffer for {} is {}", this.name, sender.getName(), sdpOffer);
@@ -160,6 +156,29 @@ public class UserSession implements Closeable {
     return incoming;
   }
 
+  public void disableAudio(UserSession sender){
+    System.out.println("co vao day");
+    log.info(sender.getName());
+    WebRtcEndpoint incoming = incomingMedia.get(sender.getName());
+    if(incoming== null){
+      System.out.printf("bang null");
+    }else{
+      sender.getOutgoingWebRtcPeer().disconnect(incoming, MediaType.AUDIO);
+    }
+
+  }
+  public void disableVideo(UserSession sender){
+    System.out.println("co vao day");
+    log.info(sender.getName());
+    WebRtcEndpoint incoming = incomingMedia.get(sender.getName());
+    if(incoming== null){
+      System.out.printf("bang null");
+    }else{
+      sender.getOutgoingWebRtcPeer().connect(incoming, MediaType.AUDIO);
+    }
+
+
+  }
   public void cancelVideoFrom(final UserSession sender) {
     this.cancelVideoFrom(sender.getName());
   }
@@ -227,6 +246,7 @@ public class UserSession implements Closeable {
     log.debug("USER {}: Sending message {}", name, message);
     synchronized (session) {
       session.sendMessage(new TextMessage(message.toString()));
+      System.out.println(message.toString());
     }
   }
 
@@ -238,6 +258,7 @@ public class UserSession implements Closeable {
       if (webRtc != null) {
         webRtc.addIceCandidate(candidate);
       }
+
     }
   }
 

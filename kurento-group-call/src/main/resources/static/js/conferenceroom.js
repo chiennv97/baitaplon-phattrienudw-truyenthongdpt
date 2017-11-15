@@ -29,18 +29,23 @@ ws.onmessage = function(message) {
 
 	switch (parsedMessage.id) {
 	case 'existingParticipants':
+	    console.log("existingParticipants");
 		onExistingParticipants(parsedMessage);
 		break;
 	case 'newParticipantArrived':
+	    console.log("newParticipantArrived");
 		onNewParticipant(parsedMessage);
 		break;
 	case 'participantLeft':
+	    console.log("participantLeft");
 		onParticipantLeft(parsedMessage);
 		break;
 	case 'receiveVideoAnswer':
+	    console.log("receiveVideoAnswer");
 		receiveVideoResponse(parsedMessage);
 		break;
 	case 'iceCandidate':
+	    console.log("iceCandidate");
 		participants[parsedMessage.name].rtcPeer.addIceCandidate(parsedMessage.candidate, function (error) {
 	        if (error) {
 		      console.error("Error adding candidate: " + error);
@@ -48,7 +53,16 @@ ws.onmessage = function(message) {
 	        }
 	    });
 	    break;
+	case 'leave':
+	    for ( var key in participants) {
+        	participants[key].dispose();
+        }
+        document.getElementById('join').style.display = 'block';
+        document.getElementById('room').style.display = 'none';
+        ws.close();
+	    break;
 	default:
+	    console.log("default");
 		console.error('Unrecognized message', parsedMessage);
 	}
 }
@@ -123,20 +137,41 @@ function onExistingParticipants(msg) {
 }
 
 function leaveRoom() {
+    x = document.getElementsByClassName('participant main');
+    c = x[0].id;
+    console.log(c);
 	sendMessage({
-		id : 'leaveRoom'
+		id : 'leaveRoom',
+		leaver: c
 	});
 
-	for ( var key in participants) {
-		participants[key].dispose();
-	}
+//	for ( var key in participants) {
+//		participants[key].dispose();
+//	}
+//
+//	document.getElementById('join').style.display = 'block';
+//	document.getElementById('room').style.display = 'none';
 
-	document.getElementById('join').style.display = 'block';
-	document.getElementById('room').style.display = 'none';
-
-	ws.close();
+//	ws.close();
 }
-
+function disableSound(){
+    x = document.getElementsByClassName('participant main');
+    c = x[0].id;
+    console.log(c);
+    sendMessage({
+    	id : 'disableSound',
+    	disabler: c
+    });
+}
+function disableVideo(){
+    x = document.getElementsByClassName('participant main');
+    c = x[0].id;
+    console.log(c);
+    sendMessage({
+    	id : 'disableVideo',
+    	disabler: c
+    });
+}
 function receiveVideo(sender) {
 	var participant = new Participant(sender);
 	participants[sender] = participant;
