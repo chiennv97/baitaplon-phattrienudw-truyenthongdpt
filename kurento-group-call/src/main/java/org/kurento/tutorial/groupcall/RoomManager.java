@@ -58,6 +58,12 @@ public class RoomManager {
     log.debug("Room {} found!", roomName);
     return room;
   }
+  public boolean checkExitRoom(String roomName){
+    if(rooms.get(roomName)==null){
+      return false;
+    }
+    return true;
+  }
   public Room getRoomAndHost(String roomName,String name) {
     log.debug("Searching for room {}", roomName);
     Room room = rooms.get(roomName);

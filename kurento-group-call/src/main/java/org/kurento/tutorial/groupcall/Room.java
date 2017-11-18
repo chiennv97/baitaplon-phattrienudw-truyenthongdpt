@@ -182,4 +182,7 @@ public class Room implements Closeable {
     log.debug("Room {} closed", this.name);
   }
 
+  public String getHostRoom() {
+    return hostRoom;
+  }
 }

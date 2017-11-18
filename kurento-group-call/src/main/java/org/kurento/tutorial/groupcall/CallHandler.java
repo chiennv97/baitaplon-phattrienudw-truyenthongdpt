@@ -56,7 +56,7 @@ public class CallHandler extends TextWebSocketHandler {
   @Autowired
   private UserRegistry registry;
 
-  private HashSet<String> listDisable = new HashSet<String>();
+  private HashMap<String,HashSet> listDisable = new HashMap<String,HashSet>();
 
   @Override
   public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
@@ -79,8 +79,12 @@ public class CallHandler extends TextWebSocketHandler {
         final UserSession sender = registry.getByName(senderName);
         final String sdpOffer = jsonMessage.get("sdpOffer").getAsString();
         user.receiveVideoFrom(sender, sdpOffer);
-        if(listDisable.contains(senderName)){
-          user.disableAudio(sender);
+        String nameOfRoom2 = user.getRoomName();
+        if(listDisable.containsKey(nameOfRoom2)){
+          if(listDisable.get(nameOfRoom2).contains(senderName)){
+            System.out.println("da vao day roi ............");
+            user.disableAudio(sender);
+          }
         }
 //        for(String key : listDisable){
 //          System.out.println("Day la key "+key);
@@ -90,15 +94,39 @@ public class CallHandler extends TextWebSocketHandler {
         break;
       case "leaveRoom":
         String leaver = jsonMessage.get("leaver").getAsString();
+        String requester = jsonMessage.get("requester").getAsString();
         JsonObject leaveMsg = new JsonObject();
-        leaveMsg.addProperty("id", "leave");
-        leaveMsg.addProperty("user", leaver);
-        users.get(leaveMsg);
-        leaveRoom(users.get(leaver));
+
+
+//        users.get(leaveMsg);
+        if(leaver.equals(requester)){
+          leaveMsg.addProperty("id", "leave");
+          leaveMsg.addProperty("typeuser", "1"); // same user request and leaver
+          leaveRoom(users.get(leaver), leaver);
+          user.sendMessage(leaveMsg);
+        } else if(roomManager.getRoom(user.getRoomName()).getHostRoom().equals(requester)){
+          leaveMsg.addProperty("id", "leave");
+          leaveMsg.addProperty("typeuser", "0"); // not same user request and leaver
+          leaveRoom(users.get(leaver), leaver);
+          user.sendMessage(leaveMsg);
+          JsonObject leaveMsg2 = new JsonObject();
+          leaveMsg2.addProperty("id", "leave");
+          leaveMsg2.addProperty("typeuser", "2"); // user leaver
+          users.get(leaver).sendMessage(leaveMsg2);
+        } else{
+          leaveMsg.addProperty("id", "permisson");
+          user.sendMessage(leaveMsg);
+        }
+
         break;
       case "disableSound":
+//        if(){
+//
+//        }
         String senderName1 = jsonMessage.get("disabler").getAsString();
-        listDisable.add(senderName1);
+        String nameOfRoom1 = user.getRoomName();
+        listDisable.get(nameOfRoom1).add(senderName1);
+
         for (String key: users.keySet()) {
           UserSession sender1 = registry.getByName(senderName1);
           users.get(key).disableAudio(sender1);
@@ -107,7 +135,8 @@ public class CallHandler extends TextWebSocketHandler {
         break;
       case "disableVideo":
         String senderName2 = jsonMessage.get("disabler").getAsString();
-        listDisable.remove(senderName2);
+        String nameOfRoom = user.getRoomName();
+        listDisable.get(nameOfRoom).remove(senderName2);
         for (String key: users.keySet()) {
           UserSession sender2 = registry.getByName(senderName2);
           users.get(key).disableVideo(sender2);
@@ -130,17 +159,24 @@ public class CallHandler extends TextWebSocketHandler {
   @Override
   public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
     UserSession user = registry.removeBySession(session);
-    roomManager.getRoom(user.getRoomName()).leave(user);
+    Room room = roomManager.getRoom(user.getRoomName());
+    if(room != null){
+//      room.leave(user);
+    }
   }
 
   private void joinRoom(JsonObject params, WebSocketSession session) throws IOException {
     final String roomName = params.get("room").getAsString();
     final String name = params.get("name").getAsString();
     log.info("PARTICIPANT {}: trying to join room {}", name, roomName);
-
+    if(!roomManager.checkExitRoom(roomName)){
+      HashSet<String> disable = new HashSet<String>();
+      listDisable.put(roomName,disable);
+    }
     Room room = roomManager.getRoomAndHost(roomName, name);
     final UserSession user = room.join(name, session);
     registry.register(user);
+//    System.out.println("host of room is: " + room.getHostRoom());
 //    ConcurrentHashMap<String, UserSession> users = registry.getAll();
 //
 //    for(String key : listDisable){
@@ -150,13 +186,14 @@ public class CallHandler extends TextWebSocketHandler {
 //    }
   }
 
-  private void leaveRoom(UserSession user) throws IOException {
+  private void leaveRoom(UserSession user, String leaver) throws IOException {
     final Room room = roomManager.getRoom(user.getRoomName());
     room.leave(user);
     if (room.getParticipants().isEmpty()) {
       roomManager.removeRoom(room);
+      listDisable.remove(user.getRoomName());
     }
-    listDisable.remove(user.getRoomName());
+    listDisable.get(user.getRoomName()).remove(leaver);
   }
 
 

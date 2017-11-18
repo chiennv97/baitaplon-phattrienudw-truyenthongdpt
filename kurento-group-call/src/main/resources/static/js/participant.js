@@ -82,7 +82,6 @@ function Participant(name) {
 		sendMessage(msg);
 	}
 
-
 	this.onIceCandidate = function (candidate, wp) {
 		  console.log("Local candidate" + JSON.stringify(candidate));
 
@@ -101,4 +100,11 @@ function Participant(name) {
 		this.rtcPeer.dispose();
 		container.parentNode.removeChild(container);
 	};
+	this.removeOut = function(){
+	    container.parentNode.removeChild(container);
+	}
+//	this.outOfRoom = function(outOfRoomName){
+//	    if(outOfRoomName == this.name){
+//	    }
+//	}
 }

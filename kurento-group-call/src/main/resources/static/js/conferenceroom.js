@@ -54,12 +54,36 @@ ws.onmessage = function(message) {
 	    });
 	    break;
 	case 'leave':
-	    for ( var key in participants) {
-        	participants[key].dispose();
-        }
-        document.getElementById('join').style.display = 'block';
-        document.getElementById('room').style.display = 'none';
-        ws.close();
+	    if(parsedMessage.typeuser === "1"){
+    	    console.log("You had out of room");
+    	    for(var propName in participants) {
+                 if(propName != name){
+                     participants[propName].removeOut();
+                 }
+            }
+	    }
+	    if(parsedMessage.typeuser === "0"){
+	        console.log("Duoi thanh cong");
+	    }
+	    if(parsedMessage.typeuser === "2"){
+	        console.log("Ban bi duoi khoi phong");
+            console.log(participants);
+//            participants["chiennv2"].dispose();
+            for(var propName in participants) {
+                if(propName != name){
+                    participants[propName].removeOut();
+                }
+            }
+	    }
+//        participants[parsedMessage.user].
+//        participants[parsedMessage.user].dispose();
+
+//        document.getElementById('join').style.display = 'block';
+//        document.getElementById('room').style.display = 'none';
+//        ws.close();
+	    break;
+	case 'permisson':
+	    console.log("you haven't permisson");
 	    break;
 	default:
 	    console.log("default");
@@ -142,7 +166,8 @@ function leaveRoom() {
     console.log(c);
 	sendMessage({
 		id : 'leaveRoom',
-		leaver: c
+		leaver: c,
+	    requester: name
 	});
 
 //	for ( var key in participants) {
@@ -164,6 +189,8 @@ function disableSound(){
     });
 }
 function disableVideo(){
+//    console.log("day la log ......");
+//    console.log(name);
     x = document.getElementsByClassName('participant main');
     c = x[0].id;
     console.log(c);
