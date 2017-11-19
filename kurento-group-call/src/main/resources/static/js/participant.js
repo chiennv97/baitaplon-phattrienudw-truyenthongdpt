@@ -28,6 +28,7 @@ const PARTICIPANT_CLASS = 'participant';
  */
 function Participant(name) {
 	this.name = name;
+	var sound = true;
 	var container = document.createElement('div');
 	container.className = isPresentMainParticipant() ? PARTICIPANT_CLASS : PARTICIPANT_MAIN_CLASS;
 	container.id = name;
@@ -63,6 +64,12 @@ function Participant(name) {
 				});
 
 				container.className = PARTICIPANT_MAIN_CLASS;
+				if(sound == true){
+				    document.getElementById('button-sound').value = "Disable Sound";
+				}
+				if(sound == false){
+				    document.getElementById('button-sound').value = "Enable Sound";
+				}
 			} else {
 			container.className = PARTICIPANT_CLASS;
 		}
@@ -103,6 +110,26 @@ function Participant(name) {
 	this.removeOut = function(){
 	    container.parentNode.removeChild(container);
 	}
+	this.getSound = function(){
+	    return sound;
+	}
+	this.setSound = function(soundset){
+	    sound = soundset;
+	}
+	this.soundToggleEnable = function(){
+	    mainclass = document.getElementsByClassName(PARTICIPANT_MAIN_CLASS);
+        nameID = mainclass[0].id;
+	    if(nameID == this.name){
+	        document.getElementById('button-sound').value = "Enable Sound";
+	    }
+	}
+	this.soundToggleDisable = function(){
+    	 mainclass = document.getElementsByClassName(PARTICIPANT_MAIN_CLASS);
+         nameID = mainclass[0].id;
+    	 if(nameID == this.name){
+    	     document.getElementById('button-sound').value = "Disable Sound";
+    	 }
+    }
 //	this.outOfRoom = function(outOfRoomName){
 //	    if(outOfRoomName == this.name){
 //	    }

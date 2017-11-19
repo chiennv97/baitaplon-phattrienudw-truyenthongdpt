@@ -85,6 +85,16 @@ ws.onmessage = function(message) {
 	case 'permisson':
 	    console.log("you haven't permisson");
 	    break;
+	case 'soundtoggle':
+	    if(parsedMessage.type == "disable"){
+	        participants[parsedMessage.user].setSound(false);
+	        participants[parsedMessage.user].soundToggleEnable();
+	    }
+	    if(parsedMessage.type == "enable"){
+	        participants[parsedMessage.user].setSound(true);
+            participants[parsedMessage.user].soundToggleDisable();
+	    }
+	    break;
 	default:
 	    console.log("default");
 		console.error('Unrecognized message', parsedMessage);
@@ -180,13 +190,31 @@ function leaveRoom() {
 //	ws.close();
 }
 function disableSound(){
+//
     x = document.getElementsByClassName('participant main');
     c = x[0].id;
-    console.log(c);
-    sendMessage({
-    	id : 'disableSound',
-    	disabler: c
-    });
+    sound = participants[c].getSound();
+    if(sound == true){
+//        document.getElementById('button-sound').value = "Enable Sound";
+//        participants[c].setSound(false);
+        sendMessage({
+            id : 'disableSound',
+           	disabler: c,
+           	requester: name
+        });
+    }
+    if(sound == false){
+//        document.getElementById('button-sound').value = "Disable Sound";
+//        participants[c].setSound(true);
+        sendMessage({
+            id : 'enableSound',
+           	disabler: c,
+           	requester: name
+        });
+    }
+//    console.log(c);
+
+
 }
 function disableVideo(){
 //    console.log("day la log ......");
@@ -229,4 +257,7 @@ function sendMessage(message) {
 	var jsonMessage = JSON.stringify(message);
 	console.log('Senging message: ' + jsonMessage);
 	ws.send(jsonMessage);
+}
+function nameButton(){
+    return "chiennv";
 }

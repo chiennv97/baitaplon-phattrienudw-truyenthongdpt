@@ -2,7 +2,10 @@
 <head>
 <meta charset="utf-8">
 <link rel="styleSheet" href="style.css" type="text/css" media="screen">
-
+<link rel="stylesheet"
+		  href="webjars/bootstrap/dist/css/bootstrap.min.css">
+<script src="webjars/jquery/dist/jquery.min.js"></script>
+<script src="webjars/bootstrap/dist/js/bootstrap.min.js"></script>
 <script src="webjars/adapter.js/adapter.js"></script>
 <script src="./js/conferenceroom.js"></script>
 <script src="./js/participant.js"></script>
@@ -32,11 +35,12 @@
 				<div id="participants"></div>
 				<input type="button" id="button-leave" onmouseup="leaveRoom();"
 					value="Leave room">
-				<input type="button" id="button-disable-sound" onmouseup="disableSound();"
-					   value="Disable sound">
+				<input type="button" id="button-sound" onmouseup="disableSound();"
+					   value="Disable Sound">
 				<input type="button" id="button-disable-video" onmouseup="disableVideo();"
 					   value="Enable sound">
 			</div>
+			
 		</div>
 	</div>
 </body>

@@ -80,6 +80,14 @@
 			<groupId>org.webjars.bower</groupId>
 			<artifactId>adapter.js</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.webjars.bower</groupId>
+			<artifactId>bootstrap</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.webjars.bower</groupId>
+			<artifactId>jquery</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>

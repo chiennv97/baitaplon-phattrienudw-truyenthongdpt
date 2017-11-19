@@ -167,7 +167,7 @@ public class UserSession implements Closeable {
     }
 
   }
-  public void disableVideo(UserSession sender){
+  public void enableSound(UserSession sender){
     System.out.println("co vao day");
     log.info(sender.getName());
     WebRtcEndpoint incoming = incomingMedia.get(sender.getName());

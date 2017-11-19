@@ -72,7 +72,18 @@ public class CallHandler extends TextWebSocketHandler {
 
     switch (jsonMessage.get("id").getAsString()) {
       case "joinRoom":
-        joinRoom(jsonMessage, session);
+        String nameRoom = jsonMessage.get("room").getAsString();
+        String joinName = jsonMessage.get("name").getAsString();
+        String hostOfRoom = roomManager.getRoom(nameRoom).getHostRoom();
+        if(!roomManager.checkExitRoom(nameRoom) || hostOfRoom ==joinName){
+          joinRoom(jsonMessage, session);
+        }else {
+          JsonObject requestJoin = new JsonObject();
+          requestJoin.addProperty("id", "requestJoin");
+          requestJoin.addProperty("user", joinName);
+          users.get(hostOfRoom).sendMessage(requestJoin);
+        }
+
         break;
       case "receiveVideoFrom":
         final String senderName = jsonMessage.get("sender").getAsString();
@@ -130,16 +141,26 @@ public class CallHandler extends TextWebSocketHandler {
         for (String key: users.keySet()) {
           UserSession sender1 = registry.getByName(senderName1);
           users.get(key).disableAudio(sender1);
+          JsonObject soundMsg = new JsonObject();
+          soundMsg.addProperty("id", "soundtoggle");
+          soundMsg.addProperty("type", "disable"); //
+          soundMsg.addProperty("user", senderName1); //
+          users.get(key).sendMessage(soundMsg);
         }
 
         break;
-      case "disableVideo":
+      case "enableSound":
         String senderName2 = jsonMessage.get("disabler").getAsString();
         String nameOfRoom = user.getRoomName();
         listDisable.get(nameOfRoom).remove(senderName2);
         for (String key: users.keySet()) {
           UserSession sender2 = registry.getByName(senderName2);
-          users.get(key).disableVideo(sender2);
+          users.get(key).enableSound(sender2);
+          JsonObject soundMsg = new JsonObject();
+          soundMsg.addProperty("id", "soundtoggle");
+          soundMsg.addProperty("type", "enable"); //
+          soundMsg.addProperty("user", senderName2); //
+          users.get(key).sendMessage(soundMsg);
         }
         break;
       case "onIceCandidate":
@@ -174,8 +195,13 @@ public class CallHandler extends TextWebSocketHandler {
       listDisable.put(roomName,disable);
     }
     Room room = roomManager.getRoomAndHost(roomName, name);
+//    if(name == room.getHostRoom()){
     final UserSession user = room.join(name, session);
     registry.register(user);
+//    }else {
+//      System.out.println("doi cap quyen ");
+//    }
+
 //    System.out.println("host of room is: " + room.getHostRoom());
 //    ConcurrentHashMap<String, UserSession> users = registry.getAll();
 //

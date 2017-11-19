@@ -71,5 +71,7 @@
     <orderEntry type="library" name="Maven: org.apache.commons:commons-lang3:3.1" level="project" />
     <orderEntry type="library" name="Maven: org.apache.commons:commons-compress:1.12" level="project" />
     <orderEntry type="library" name="Maven: org.webjars.bower:adapter.js:0.2.9" level="project" />
+    <orderEntry type="library" name="Maven: org.webjars.bower:bootstrap:3.3.6" level="project" />
+    <orderEntry type="library" name="Maven: org.webjars.bower:jquery:1.12.3" level="project" />
   </component>
 </module>
