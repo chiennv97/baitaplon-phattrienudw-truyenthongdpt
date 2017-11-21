@@ -74,14 +74,20 @@ public class CallHandler extends TextWebSocketHandler {
       case "joinRoom":
         String nameRoom = jsonMessage.get("room").getAsString();
         String joinName = jsonMessage.get("name").getAsString();
-        String hostOfRoom = roomManager.getRoom(nameRoom).getHostRoom();
-        if(!roomManager.checkExitRoom(nameRoom) || hostOfRoom ==joinName){
+        Room room = roomManager.getRoom(nameRoom);
+        if(room == null ){
           joinRoom(jsonMessage, session);
-        }else {
-          JsonObject requestJoin = new JsonObject();
-          requestJoin.addProperty("id", "requestJoin");
-          requestJoin.addProperty("user", joinName);
-          users.get(hostOfRoom).sendMessage(requestJoin);
+        }
+        else {
+          String hostOfRoom = room.getHostRoom();
+          if(hostOfRoom == joinName){
+            joinRoom(jsonMessage, session);
+          } else{
+            JsonObject requestJoin = new JsonObject();
+            requestJoin.addProperty("id", "requestJoin");
+            requestJoin.addProperty("user", joinName);
+            users.get(hostOfRoom).sendMessage(requestJoin);
+          }
         }
 
         break;

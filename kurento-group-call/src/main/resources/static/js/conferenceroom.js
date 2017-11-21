@@ -108,6 +108,7 @@ function register() {
 	document.getElementById('room-header').innerText = 'ROOM ' + room;
 	document.getElementById('join').style.display = 'none';
 	document.getElementById('room').style.display = 'block';
+	document.getElementById('msg').style.display = 'block';
 
 	var message = {
 		id : 'joinRoom',

@@ -13,7 +13,8 @@
 </head>
 <body>
 	<div id="container">
-		<div id="wrapper">
+		<!--<div id="wrapper">-->
+		<div class="row">
 			<div id="join" class="animate join">
 				<h1>Join a Room</h1>
 				<form onsubmit="register(); return false;" accept-charset="UTF-8">
@@ -30,18 +31,34 @@
 					</p>
 				</form>
 			</div>
+		</div>
+		<div class="row">
 			<div id="room" style="display: none;">
 				<h2 id="room-header"></h2>
-				<div id="participants"></div>
-				<input type="button" id="button-leave" onmouseup="leaveRoom();"
-					value="Leave room">
-				<input type="button" id="button-sound" onmouseup="disableSound();"
-					   value="Disable Sound">
-				<input type="button" id="button-disable-video" onmouseup="disableVideo();"
-					   value="Enable sound">
+				<div class="col-sm-8">
+					<div id="participants"></div>
+				</div>
+				<div class="col-sm-4">
+					<input type="button" class="btn btn-danger" id="button-leave" onmouseup="leaveRoom();"
+						value="Leave room">
+					<input type="button" class="btn btn-success" id="button-sound" onmouseup="disableSound();"
+						   value="Disable Sound">
+					<!--<input type="button" id="button-disable-video" onmouseup="disableVideo();"-->
+						   <!--value="Enable sound">-->
+					<div id="msg" class="card w-10 well" style="display: none;">
+						<div class="card-block">
+							<h3 class="card-title">Card title</h3>
+							<input type="button" class="btn btn-info" onmouseup="" value="OK">
+							<input type="button" class="btn" onmouseup="" value="Cancel">
+
+						</div>
+					</div>
+				</div>
 			</div>
-			
+
+		<!--</div>-->
 		</div>
 	</div>
+
 </body>
 </html>
