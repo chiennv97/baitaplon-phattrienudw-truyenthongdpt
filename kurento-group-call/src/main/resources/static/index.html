@@ -16,15 +16,23 @@
 		<!--<div id="wrapper">-->
 		<div class="row">
 			<div id="join" class="animate join">
-				<h1>Join a Room</h1>
-				<form onsubmit="register(); return false;" accept-charset="UTF-8">
+				<h1>Login</h1>
+				<form onsubmit="login(); return false;" accept-charset="UTF-8">
 					<p>
 						<input type="text" name="name" value="" id="name"
 							placeholder="Username" required>
 					</p>
+					<p class="submit">
+						<input type="submit" name="commit" value="Join!">
+					</p>
+				</form>
+			</div>
+			<div id="joined" class="animate join" style="display: none;">
+				<h1>Join a Room</h1>
+				<form onsubmit="register(); return false;" accept-charset="UTF-8">
 					<p>
 						<input type="text" name="room" value="" id="roomName"
-							placeholder="Room" required>
+							   placeholder="Room" required>
 					</p>
 					<p class="submit">
 						<input type="submit" name="commit" value="Join!">
@@ -48,8 +56,8 @@
 					<div id="msg" class="card w-10 well" style="display: none;">
 						<div class="card-block">
 							<h3 class="card-title">Card title</h3>
-							<input type="button" class="btn btn-info" onmouseup="" value="OK">
-							<input type="button" class="btn" onmouseup="" value="Cancel">
+							<input type="button" class="btn btn-info" onmouseup="acceptJoin();" value="OK">
+							<input type="button" class="btn" onmouseup="cancelJoin();" value="Cancel">
 
 						</div>
 					</div>

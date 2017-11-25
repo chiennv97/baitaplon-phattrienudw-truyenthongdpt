@@ -57,7 +57,8 @@ public class CallHandler extends TextWebSocketHandler {
   private UserRegistry registry;
 
   private HashMap<String,HashSet> listDisable = new HashMap<String,HashSet>();
-
+  private HashMap<String, WebSocketSession> tempSession = new HashMap<String, WebSocketSession>();
+  private ArrayList<String> listOnline = new ArrayList<String>();
   @Override
   public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
     final JsonObject jsonMessage = gson.fromJson(message.getPayload(), JsonObject.class);
@@ -71,6 +72,9 @@ public class CallHandler extends TextWebSocketHandler {
     }
 
     switch (jsonMessage.get("id").getAsString()) {
+      case "login":
+        listOnline.add(jsonMessage.get("name").getAsString());
+        break;
       case "joinRoom":
         String nameRoom = jsonMessage.get("room").getAsString();
         String joinName = jsonMessage.get("name").getAsString();
@@ -86,7 +90,9 @@ public class CallHandler extends TextWebSocketHandler {
             JsonObject requestJoin = new JsonObject();
             requestJoin.addProperty("id", "requestJoin");
             requestJoin.addProperty("user", joinName);
+            requestJoin.addProperty("room", nameRoom);
             users.get(hostOfRoom).sendMessage(requestJoin);
+            tempSession.put(joinName,session);
           }
         }
 
@@ -177,6 +183,13 @@ public class CallHandler extends TextWebSocketHandler {
               candidate.get("sdpMid").getAsString(), candidate.get("sdpMLineIndex").getAsInt());
           user.addCandidate(cand, jsonMessage.get("name").getAsString());
         }
+        break;
+      case "acceptJoin":
+        System.out.println("da nhan mess");
+        JsonObject acceptMsg = new JsonObject();
+        acceptMsg.addProperty("room",jsonMessage.get("roomAccept").getAsString());
+        acceptMsg.addProperty("name",jsonMessage.get("userAccept").getAsString());
+        joinRoom(acceptMsg, tempSession.get(jsonMessage.get("userAccept").getAsString()));
         break;
       default:
         break;

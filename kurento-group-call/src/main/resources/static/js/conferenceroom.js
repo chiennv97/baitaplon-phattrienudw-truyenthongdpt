@@ -18,7 +18,9 @@
 var ws = new WebSocket('wss://' + location.host + '/groupcall');
 var participants = {};
 var name;
-
+var room;
+var joinUser;
+var joinRoom;
 window.onbeforeunload = function() {
 	ws.close();
 };
@@ -95,20 +97,35 @@ ws.onmessage = function(message) {
             participants[parsedMessage.user].soundToggleDisable();
 	    }
 	    break;
+	case 'requestJoin':
+	    console.log(parsedMessage.user + "yeu cau join");
+	    document.getElementById('msg').style.display = 'block';
+	    joinUser = parsedMessage.user;
+	    joinRoom = parsedMessage.room;
+	    break;
 	default:
 	    console.log("default");
 		console.error('Unrecognized message', parsedMessage);
 	}
 }
-
+function login(){
+    name = document.getElementById('name').value;
+    document.getElementById('join').style.display = 'none';
+    document.getElementById('joined').style.display = 'block';
+    var message = {
+        id: 'login',
+        name: name,
+    }
+    sendMessage(message);
+}
 function register() {
-	name = document.getElementById('name').value;
-	var room = document.getElementById('roomName').value;
+//	name = document.getElementById('name').value;
+	room = document.getElementById('roomName').value;
 
 	document.getElementById('room-header').innerText = 'ROOM ' + room;
-	document.getElementById('join').style.display = 'none';
+	document.getElementById('joined').style.display = 'none';
 	document.getElementById('room').style.display = 'block';
-	document.getElementById('msg').style.display = 'block';
+
 
 	var message = {
 		id : 'joinRoom',
@@ -227,6 +244,15 @@ function disableVideo(){
     	id : 'disableVideo',
     	disabler: c
     });
+}
+
+function acceptJoin(){
+    sendMessage({
+       	id : 'acceptJoin',
+    	userAccept: joinUser,
+    	roomAccept: joinRoom
+    });
+    console.log("da gui mess")
 }
 function receiveVideo(sender) {
 	var participant = new Participant(sender);
