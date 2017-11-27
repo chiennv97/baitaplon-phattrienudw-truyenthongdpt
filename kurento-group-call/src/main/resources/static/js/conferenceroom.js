@@ -21,6 +21,7 @@ var name;
 var room;
 var joinUser;
 var joinRoom;
+var listOnline;
 window.onbeforeunload = function() {
 	ws.close();
 };
@@ -97,11 +98,36 @@ ws.onmessage = function(message) {
             participants[parsedMessage.user].soundToggleDisable();
 	    }
 	    break;
+	case 'disableSound':
+	    if(parsedMessage.type==0){
+	        console.log("ban da tat tieng");
+	    }
+	    if(parsedMessage.type==1){
+	        console.log("ban bi tat tieng");
+	    }
+	    break;
+    case 'enableSound':
+        if(parsedMessage.type==0){
+   	        console.log("ban da bat tieng");
+  	    }
+        if(parsedMessage.type==1){
+            console.log("ban duoc bat tieng");
+        }
+	    break;
 	case 'requestJoin':
 	    console.log(parsedMessage.user + "yeu cau join");
-	    document.getElementById('msg').style.display = 'block';
 	    joinUser = parsedMessage.user;
-	    joinRoom = parsedMessage.room;
+        joinRoom = parsedMessage.room;
+        var userJoin = joinUser;
+	    var parent = document.getElementById('msg');
+	    var newChild = '<div id="'+joinUser+'" class="card-block"> <h3 class="card-title">Card title</h3> <input type="button" class="btn btn-info" onmouseup="acceptJoin(\'' + userJoin + '\');" value="OK"> <input type="button" class="btn" onmouseup="getListOnline();" value="Cancel"> </div>';
+        parent.insertAdjacentHTML('beforeend', newChild);
+
+
+	    break;
+	case 'getListOnline':
+        listOnline = parsedMessage.listOnline;
+        console.log(listOnline);
 	    break;
 	default:
 	    console.log("default");
@@ -220,6 +246,7 @@ function disableSound(){
            	disabler: c,
            	requester: name
         });
+        console.log("gui request");
     }
     if(sound == false){
 //        document.getElementById('button-sound').value = "Disable Sound";
@@ -229,27 +256,29 @@ function disableSound(){
            	disabler: c,
            	requester: name
         });
+        console.log("gui request");
     }
 //    console.log(c);
 
 
 }
-function disableVideo(){
-//    console.log("day la log ......");
-//    console.log(name);
-    x = document.getElementsByClassName('participant main');
-    c = x[0].id;
-    console.log(c);
-    sendMessage({
-    	id : 'disableVideo',
-    	disabler: c
-    });
-}
+//function disableVideo(){
+////    console.log("day la log ......");
+////    console.log(name);
+//    x = document.getElementsByClassName('participant main');
+//    c = x[0].id;
+//    console.log(c);
+//    sendMessage({
+//    	id : 'disableVideo',
+//    	disabler: c
+//    });
+//}
 
-function acceptJoin(){
+function acceptJoin(userJoin){
+
     sendMessage({
        	id : 'acceptJoin',
-    	userAccept: joinUser,
+    	userAccept: userJoin,
     	roomAccept: joinRoom
     });
     console.log("da gui mess")
@@ -287,4 +316,9 @@ function sendMessage(message) {
 }
 function nameButton(){
     return "chiennv";
+}
+function getListOnline(){
+    sendMessage({
+           	id : 'getListOnline'
+    });
 }
